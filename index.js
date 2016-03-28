@@ -166,11 +166,17 @@ function apiRequest (method, params, callback) {
             json += chunk;
         })
         .on('end', function () {
-            callback(JSON.parse(json || '{}'));
+            var responseStr = json, result;
+            try {
+                result = JSON.parse(responseStr);
+                callback(result);
+            } catch (err) {
+                callback({error: err});
+            }
         });
     })
-    .on('error', function () {
-        // TODO
+    .on('error', function (err) {
+        callback({error: err});
     })
     .end(makeQueryString(params));
 
@@ -188,8 +194,8 @@ function getRequest (url, callback) {
             callback(data);
         });
     })
-    .on('error', function () {
-        // TODO
+    .on('error', function (err) {
+        callback({error: err});
     });
 
 }
